@@ -61,6 +61,7 @@ var stage = new PIXI.Container();
 
 PIXI.loader
 	.add("background", "assets/bg.png")
+	.add("assets/balls-tileset.png")
 	.load(setup);
 
 function setup(){
@@ -84,6 +85,15 @@ function setup(){
 			stage.addChild(numero);
 		}
 	}
+
+	var texture = PIXI.utils.TextureCache["assets/balls-tileset.png"];
+
+	var rectangle = new PIXI.Rectangle(0, 0, 30, 30);
+	texture.frame = rectangle;
+	var bola = new PIXI.Sprite(texture);
+	bola.x = 17;
+	bola.y = 338;
+	stage.addChild(bola);
 			
 	renderer.render(stage);
 }
