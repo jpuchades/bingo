@@ -1,0 +1,6 @@
+dimensiones:
+
+stage: 760 x 480
+casilla numero: 52 x 27
+margen: 20, 124
+
