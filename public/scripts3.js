@@ -1,5 +1,8 @@
 var NBOLAS = 60;
 var DIM_CASILLA = {ancho: 52, alto: 27};
+
+var DIM_BOLA = {ancho:30, alto:30};
+
 var CARTONES = [
 	{x: 20, y: 97},
 	{x: 480, y: 97},
@@ -11,7 +14,7 @@ var COLUMNAS_CARTON = 5;
 var FILAS_CARTON = 3;
 var PADDING_CASILLA = 5;
 
-var rellena_bombo = function(n){
+var inicia_numeros = function(n){
 	var bombo = new Array();
 	for(var i = 0; i < n; i++){
 		bombo[i] = i+1;
@@ -20,21 +23,21 @@ var rellena_bombo = function(n){
 	return bombo;
 }
 
-var BOMBO = rellena_bombo(NBOLAS);
+var VECTOR_NUMEROS = inicia_numeros(NBOLAS);
 
-var saca_bola = function(){
-	//console.log(BOMBO);
-	var pos = Math.floor(Math.random() * BOMBO.length);
+var genera_numero = function(){
+	//console.log(VECTOR_NUMEROS);
+	var pos = Math.floor(Math.random() * VECTOR_NUMEROS.length);
 	//console.log('pos: ' + pos);
-	var bola = BOMBO[pos];
+	var bola = VECTOR_NUMEROS[pos];
 	//console.log('bola: ' + bola);
-	BOMBO.splice(pos, 1);
+	VECTOR_NUMEROS.splice(pos, 1);
 	return bola;
 }
 
 var dibuja_carton = function(coordenadas_carton){
 	for(var i = 0; i < coordenadas_carton.length; i++){
-		var bola = saca_bola(BOMBO);
+		var bola = genera_numero(VECTOR_NUMEROS);
 		coordenadas_carton[i]._b = bola;
 	}
 }
@@ -54,6 +57,34 @@ var coordenadas_carton = function(n, callback){
 
 	return resultado;
 };
+
+var saco_de_bolas = function(){
+	var saco = new Array();
+	var v = 1;
+	for(var f = 0; f < 10; f++){
+		for(var c = 0; c < 10; c++){
+			var bola = {
+				valor: v,
+				x: c*DIM_BOLA.ancho,
+				y: f*DIM_BOLA.alto,
+			};
+			v++;
+			saco.push(bola);
+		}
+	}
+
+	return saco;
+}
+
+var SACO = saco_de_bolas();
+
+var extrae_bola = function(){
+	var pos = Math.floor(Math.random() * NBOLAS);
+	var bola = SACO[pos];
+	SACO.splice(pos, 1)
+
+	return bola;
+}
 
 var renderer = PIXI.autoDetectRenderer(760, 480);
 document.body.appendChild(renderer.view);
@@ -87,13 +118,29 @@ function setup(){
 	}
 
 	var texture = PIXI.utils.TextureCache["assets/balls-tileset.png"];
+	
+	var FILAS_BOLA = [
+		{x: 17, y: 338, total_bolas: 8},
+		{x: 17, y: 368, total_bolas: 7},
+		{x: 443, y: 338, total_bolas: 8},
+		{x: 443, y: 368, total_bolas: 7}
+	];
 
-	var rectangle = new PIXI.Rectangle(0, 0, 30, 30);
-	texture.frame = rectangle;
-	var bola = new PIXI.Sprite(texture);
-	bola.x = 17;
-	bola.y = 338;
-	stage.addChild(bola);
-			
+	for(var f = 0; f < FILAS_BOLA.length; f++){
+		var shown = 0;
+		console.log("dibujar en: ("+ FILAS_BOLA[f].x + ", " + FILAS_BOLA[f].y +")");
+		while(shown <= FILAS_BOLA[f].total_bolas){
+			var b = extrae_bola();
+			console.log(b);
+			var rectangle = new PIXI.Rectangle(b.x, b.y, 30, 30);
+			texture.frame = rectangle;
+			var bola = new PIXI.Sprite(texture);
+			bola.x = FILAS_BOLA[f].x + (DIM_BOLA.ancho*shown);
+			bola.y = FILAS_BOLA[f].y;
+			console.log("[" + bola.x + ", " + bola.y + "]");
+			stage.addChild(bola);
+			shown++;			
+		}
+	}
 	renderer.render(stage);
 }
